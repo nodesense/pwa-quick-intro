@@ -1,0 +1,65 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Web Worker and PWA</title>
+
+    <script >
+        if (typeof(Worker) !== "undefined") {
+           console.log('Web worker supported');
+           // create separate background thread for web_worker.js
+           var worker = new Worker("web_worker.js");
+        } else {
+            console.log('No Web worker support');
+        }
+    </script>
+
+    <script> 
+        if ('serviceWorker' in navigator) {
+            console.log('serviceWorker supported');
+            // import service-worker after load
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js')
+                .then(function(registration) {
+                    
+                // Registration was successful
+                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                }, function(err) {
+                // registration failed :(
+                console.log('ServiceWorker registration failed: ', err);
+                });
+            });
+        }
+
+    </script>
+</head>
+<body>
+
+    <p id="result"> </p>
+
+    <img src="/image1.png" width="200" height="200" />
+
+
+    <img src="/react.jpg" width="200" height="200" />
+    
+    <script>
+            // susbcribe for message posted from web worker
+            worker.onmessage = function(event){
+             document.getElementById("result").innerHTML = event.data;
+            };   
+
+            setTimeout( () => {
+                worker.postMessage('Hello from Web page');
+
+            }, 2000);
+
+            setTimeout( () => {
+                worker.terminate();
+                console.log('worker terminated');
+            }, 20000)
+            //   
+
+    </script>
+</body>
+</html>
